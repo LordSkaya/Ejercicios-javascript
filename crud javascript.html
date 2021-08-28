@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Crud Paises</title>
+  <style>
+    input[type='submit'], button, [aria-label]{
+      cursor: pointer;
+    }
+    #spoiler{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<form action="javascript:void(0);" method="POST" onsubmit="app.Agregar()"> 
+  <input type="text" id="Nombre" placeholder="Nuevo Pais">
+  <input type="submit" value="Agregar">
+</form>
+
+<div id="spoiler" role="aria-hidden">
+  <form action="javascript:void(0);" method="POST" id="saveEditar">
+    <input type="text" id="edit-nombre">
+    <input type="submit" value="Editar" /> <a onclick="CloseInput()" aria-label="Close">&#10006;</a>
+  </form>
+</div>
+
+<p id="counter"></p>
+
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+    <tbody id="paises">
+    </tbody>
+</table>
+
+<script>
+var app = new function() {
+  this.el = document.getElementById('paises');
+  this.paises = ['Colombia', 'Panama', 'Chile', 'Mexico', 'Peru', 'Argentina', 'Uruguay', 'El Salvador', 'Honduras'];
+  this.Count = function(data) {
+    var el   = document.getElementById('counter');
+    var nombre = 'pais';
+    if (data) {
+      if (data > 1) {
+        nombre = 'paises';
+      }
+      el.innerHTML = data + ' ' + nombre ;
+    } else {
+      el.innerHTML = 'No ' + nombre;
+    }
+  };
+  
+  this.FetchAll = function() {
+    var data = '';
+    if (this.paises.length > 0) {
+      for (i = 0; i < this.paises.length; i++) {
+        data += '<tr>';
+        data += '<td>' + this.paises[i] + '</td>';
+        data += '<td><button onclick="app.Editar(' + i + ')">Editar</button></td>';
+        data += '<td><button onclick="app.Eliminar(' + i + ')">Eliminar</button></td>';
+        data += '</tr>';
+      }
+    }
+    this.Count(this.paises.length);
+    return this.el.innerHTML = data;
+  };
+  this.Agregar = function () {
+    el = document.getElementById('Nombre');
+    // obtener un valor
+    var pais = el.value;
+    if (pais) {
+      // Agregar un nuevo valor
+      this.paises.push(pais.trim());
+      // Reset input value
+      el.value = '';
+      // Mostrar una nueva lista
+      this.FetchAll();
+    }
+  };
+  this.Editar = function (item) {
+    var el = document.getElementById('edit-nombre');
+    // Display value in the field
+    el.value = this.paises[item];
+    // Campos de visualización
+    document.getElementById('spoiler').style.display = 'block';
+    self = this;
+    document.getElementById('saveEditar').onsubmit = function() {
+      // obtener value
+      var pais = el.value;
+      if (pais) {
+        // Editar valores
+        self.paises.splice(item, 1, pais.trim());
+        // Display the new list
+        self.FetchAll();
+        // Ocultar campos
+        CloseInput();
+      }
+    }
+  };
+  this.Eliminar = function (item) {
+    // Eliminar the current row
+    this.paises.splice(item, 1);
+    // Display the new list
+    this.FetchAll();
+  };
+  
+}
+app.FetchAll();
+function CloseInput() {
+  document.getElementById('spoiler').style.display = 'none';
+}
+</script>
+</body>
+</html>
